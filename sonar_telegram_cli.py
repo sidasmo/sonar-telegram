@@ -1,4 +1,3 @@
-import os
 from sonar_telegram import init
 import asyncio
 import click
