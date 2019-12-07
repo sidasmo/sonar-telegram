@@ -1,3 +1,4 @@
+import os
 from sonar_telegram import init
 import asyncio
 import click
@@ -28,10 +29,23 @@ def listen(dialog_id):
 
 
 @cli.command()
+@click.argument('msg')
+def send(msg):
+    opts = {"msg": msg}
+    loop(send_message, opts)
+
+
+@cli.command()
 @click.argument('dialog_id')
 def dialog(dialog_id):
     opts = {"dialog_id": int(dialog_id)}
     loop(get_dialog_cb, opts)
+
+
+async def send_message(client, opts={}):
+    msg = opts.get('msg')
+    if msg is not None:
+        await client.telegram.send_message("franz", msg)
 
 
 async def listen_cb(client, opts={}):
