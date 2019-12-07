@@ -9,6 +9,9 @@ setup(
     py_modules=['sonar_telegram_cli', 'sonar_telegram', 'telegram_api_credentials'],
     install_requires=[
         'Click',
+        'aiohttp',
+        'tika',
+        'telethon',
         ],
     url='http://github.com/osuiowq/sonar-telegram',
     author='osuiowq / arso-project',
