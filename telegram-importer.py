@@ -4,11 +4,11 @@ import asyncio
 import json
 import datetime
 from telethon import TelegramClient, events
-from telethon.tl.types import DocumentAttributeFilename
+from telethon.tl.patched import Message
+from telethon.tl.types import DocumentAttributeFilename, MessageMediaDocument, MessageMediaPhoto, PeerUser, Document, DocumentAttributeVideo, DocumentAttributeFilename, PhotoStrippedSize, PhotoSize, InputPeerSelf, InputPeerUser, User, UserStatusOffline, UserProfilePhoto, Photo, MessageService, MessageActionPhoneCall, MessageService, PhoneCallDiscardReasonMissed, PhoneCallDiscardReasonHangup, FileLocationToBeDeprecated, DocumentAttributeAudio
 from tika import parser
 from sonarclient import SonarClient
 from telegram_api_credentials import *
-
 
 class SonarTelegram():
 
@@ -25,13 +25,10 @@ class SonarTelegram():
 
         self.data = {}
 
-        @self.telegram.on(events.NewMessage)
-        async def my_event_handler(event):
-            print("EVENT")
-            print('{}'.format(event))
-        # self.sonarclient.addCommandHandler(self.oncommand)
-        # self.telegram_client.loop.create_task(self.sonarclient.start())
-        # self.loop.run_until_disconnect()
+        # @self.telegram.on(events.NewMessage)
+        # async def my_event_handler(event):
+            # print("EVENT")
+            # print(event.original_update)
 
     async def ensure_schema(self, schema_name, schema):
         schema = await self.sonar.get_schema(schema_name)
@@ -62,18 +59,20 @@ class SonarTelegram():
         msg_set = []
         msgs = self.telegram.iter_messages(dialog_id)
         async for msg in msgs:
-            print(json.dumps(msg.to_dict(), default=date_format))
-            msg_json = await self.create_message_schema(msg)
+            msg_json = json.dumps(msg, cls=teleJSONEncoder)
             msg_set.append(msg_json)
         return msg_set
 
-    async def create_message_schema(self, message):
-        return json.dumps({
-            "id": message.id,
-            "from_id": message.from_id,
-            "date": message.date.isoformat(),
-            "content": message.message
-        })
+    # async def create_message_schema(self, message):
+        # return json.dumps({
+            # "id": message.id,
+            # "from_id": message.from_id,
+            # "date": message.date.isoformat(),
+            # "content": message.message,
+            # "silent": message.silent,
+            # "mentioned": message.mentioned
+        # })
+        # return json.dumps(message, cls=teleJSONEncoder)
 
     def create_webpage_schema(self, webpage, msg_id):
         return json.dumps({
@@ -88,7 +87,6 @@ class SonarTelegram():
     async def create_document_json(self, document, datadir, msg_id):
         for attribute in document.attributes:
             if type(attribute) is DocumentAttributeFilename:
-                print(attribute)
                 if not os.path.isfile(datadir + "/" + attribute.file_name):
                     path = await self.telegram.download_media(
                         message=document,
@@ -108,25 +106,78 @@ class SonarTelegram():
 
 
 async def demo(client):
+    with open('./schemas/telSchema_MessageMediaPhoto.json') as json_file:
+        data = json.load(json_file)
+        await client.sonar.put_schema('telegram.photoMessage', data)
+    with open('./schemas/telSchema_MessageMediaVideo.json') as json_file:
+        data = json.load(json_file)
+        await client.sonar.put_schema('telegram.videoMessage', data)
+    with open('./schemas/telSchema_MessageMediaAudio.json') as json_file:
+        data = json.load(json_file)
+        await client.sonar.put_schema('telegram.audioMessage', data)
+    with open('./schemas/telSchema_MessageMediaPlain.json') as json_file:
+        data = json.load(json_file)
+        await client.sonar.put_schema('telegram.plainMessage', data)
+
     dialogs = await client.get_jsondialogs()
     last_dialog_id = json.loads(dialogs[0])["dialog_id"]
     messages = await client.get_messages(last_dialog_id)
     for msg in messages:
-        print("#"*10)
         msg = json.loads(msg)
-        print(msg)
+        if msg['media'] is None:
+            schema = "telegram.plainMessage"
+        elif 'MessageMediaAudio' in msg['media']:
+            schema = "telegram.audioMessage"
+        elif 'MessageMediaVideo' in msg['media']:
+            schema = "telegram.videoMessage"
+        elif 'MessageMediaPhoto' in msg['media']:
+            schema = "telegram.audioPhoto"
         id = await client.sonar.put({
-            "schema": "telegram.message",
+            "schema": schema,
             "value": msg,
             "id": "telegram." + str(msg["id"])
         })
-        print("imported: " + id)
-
 
 def date_format(message):
     if type(message) == datetime:
         return message.isoformat()
 
+class teleJSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, (str, int, float)):
+            return json.JSONEncoder.default(self, o)
+        elif o is None:
+            return 'Python_None'
+        elif isinstance(o, Message):
+            return filter_telMessage(o)
+        elif isinstance(o, MessageService):
+            return o.__dict__
+        elif isinstance(o, datetime.date):
+            return o.isoformat()
+        elif isinstance(o, MessageMediaDocument):
+            return {
+                o.__class__.__name__: o.document.__dict__,
+                'ttl_seconds': o.ttl_seconds
+            }
+        elif isinstance(o, MessageMediaPhoto):
+            return {
+                o.__class__.__name__: o.photo.__dict__,
+                'ttl_seconds': o.ttl_seconds
+            }
+        elif isinstance(o, (Document, PeerUser, DocumentAttributeVideo, DocumentAttributeFilename, PhotoStrippedSize, PhotoSize, InputPeerSelf, InputPeerUser, User, UserStatusOffline, UserProfilePhoto, Photo, MessageActionPhoneCall, MessageService, PhoneCallDiscardReasonMissed, PhoneCallDiscardReasonHangup, FileLocationToBeDeprecated, DocumentAttributeAudio)):
+            return {
+                o.__class__.__name__: o.__dict__
+            }
+        pass
+
+def filter_telMessage(message):
+    message = message.__dict__.items()
+    retMessage = {}
+    wanted = ['id', 'to_id', 'date', 'out', 'mentioned', 'media']
+    for (key, val) in message:
+        if (key[0] != '_'):
+            retMessage[key]=val
+    return retMessage
 
 async def init(loop):
     client = SonarTelegram(

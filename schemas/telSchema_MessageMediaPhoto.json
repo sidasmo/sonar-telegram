@@ -1,0 +1,250 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "object",
+  "title": "Telegram Photo Message",
+  "properties": {
+    "id": {
+      "$id": "#/properties/id",
+      "type": "integer",
+      "title": "The Id Schema"
+    },
+    "to_id": {
+      "$id": "#/properties/to_id",
+      "type": "object",
+      "title": "The To_id Schema",
+      "required": [
+        "PeerUser"
+      ],
+      "properties": {
+        "PeerUser": {
+          "$id": "#/properties/to_id/properties/PeerUser",
+          "type": "object",
+          "title": "The Peeruser Schema",
+          "required": [
+            "user_id"
+          ],
+          "properties": {
+            "user_id": {
+              "$id": "#/properties/to_id/properties/PeerUser/properties/user_id",
+              "type": "integer",
+              "title": "The User_id Schema"
+            }
+          }
+        }
+      }
+    },
+    "date": {
+      "$id": "#/properties/date",
+      "type": "string",
+      "title": "The Date Schema",
+      "pattern": "^(.*)$"
+    },
+    "out": {
+      "$id": "#/properties/out",
+      "type": "boolean",
+      "title": "The Out Schema"
+    },
+    "mentioned": {
+      "$id": "#/properties/mentioned",
+      "type": "boolean",
+      "title": "The Mentioned Schema"
+    },
+    "media_unread": {
+      "$id": "#/properties/media_unread",
+      "type": "boolean",
+      "title": "The Media_unread Schema"
+    },
+    "silent": {
+      "$id": "#/properties/silent",
+      "type": "boolean",
+      "title": "The Silent Schema"
+    },
+    "post": {
+      "$id": "#/properties/post",
+      "type": "boolean",
+      "title": "The Post Schema"
+    },
+    "from_id": {
+      "$id": "#/properties/from_id",
+      "type": "integer",
+      "title": "The From_id Schema"
+    },
+    "reply_to_msg_id": {
+      "$id": "#/properties/reply_to_msg_id",
+      "type": "null",
+      "title": "The Reply_to_msg_id Schema"
+    },
+    "message": {
+      "$id": "#/properties/message",
+      "type": "string",
+      "title": "The Message Schema",
+      "pattern": "^(.*)$"
+    },
+    "fwd_from": {
+      "$id": "#/properties/fwd_from",
+      "type": "null",
+      "title": "The Fwd_from Schema"
+    },
+    "via_bot_id": {
+      "$id": "#/properties/via_bot_id",
+      "type": "null",
+      "title": "The Via_bot_id Schema"
+    },
+    "media": {
+      "$id": "#/properties/media",
+      "type": "object",
+      "title": "The Media Schema",
+      "required": [
+        "MessageMediaPhoto",
+        "ttl_seconds"
+      ],
+      "properties": {
+        "MessageMediaPhoto": {
+          "$id": "#/properties/media/properties/MessageMediaPhoto",
+          "type": "object",
+          "title": "The Messagemediaphoto Schema",
+          "required": [
+            "id",
+            "access_hash",
+            "file_reference",
+            "date",
+            "sizes",
+            "dc_id",
+            "has_stickers"
+          ],
+          "properties": {
+            "id": {
+              "$id": "#/properties/media/properties/MessageMediaPhoto/properties/id",
+              "type": "integer",
+              "title": "The Id Schema"
+            },
+            "access_hash": {
+              "$id": "#/properties/media/properties/MessageMediaPhoto/properties/access_hash",
+              "type": "integer",
+              "title": "The Access_hash Schema"
+            },
+            "file_reference": {
+              "$id": "#/properties/media/properties/MessageMediaPhoto/properties/file_reference",
+              "type": "null",
+              "title": "The File_reference Schema"
+            },
+            "date": {
+              "$id": "#/properties/media/properties/MessageMediaPhoto/properties/date",
+              "type": "string",
+              "title": "The Date Schema",
+              "pattern": "^(.*)$"
+            },
+            "sizes": {
+              "$id": "#/properties/media/properties/MessageMediaPhoto/properties/sizes",
+              "type": "array",
+              "title": "The Sizes Schema",
+              "items": {
+                "$id": "#/properties/media/properties/MessageMediaPhoto/properties/sizes/items",
+                "type": "object",
+                "title": "The Items Schema",
+                "required": [
+                  "PhotoStrippedSize"
+                ],
+                "properties": {
+                  "PhotoStrippedSize": {
+                    "$id": "#/properties/media/properties/MessageMediaPhoto/properties/sizes/items/properties/PhotoStrippedSize",
+                    "type": "object",
+                    "title": "The Photostrippedsize Schema",
+                    "required": [
+                      "type",
+                      "bytes"
+                    ],
+                    "properties": {
+                      "type": {
+                        "$id": "#/properties/media/properties/MessageMediaPhoto/properties/sizes/items/properties/PhotoStrippedSize/properties/type",
+                        "type": "string",
+                        "title": "The Type Schema",
+                        "pattern": "^(.*)$"
+                      },
+                      "bytes": {
+                        "$id": "#/properties/media/properties/MessageMediaPhoto/properties/sizes/items/properties/PhotoStrippedSize/properties/bytes",
+                        "type": "null",
+                        "title": "The Bytes Schema"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "dc_id": {
+              "$id": "#/properties/media/properties/MessageMediaPhoto/properties/dc_id",
+              "type": "integer",
+              "title": "The Dc_id Schema"
+            },
+            "has_stickers": {
+              "$id": "#/properties/media/properties/MessageMediaPhoto/properties/has_stickers",
+              "type": "boolean",
+              "title": "The Has_stickers Schema"
+            }
+          }
+        },
+        "ttl_seconds": {
+          "$id": "#/properties/media/properties/ttl_seconds",
+          "type": "null",
+          "title": "The Ttl_seconds Schema"
+        }
+      }
+    },
+    "reply_markup": {
+      "$id": "#/properties/reply_markup",
+      "type": "null",
+      "title": "The Reply_markup Schema"
+    },
+    "entities": {
+      "$id": "#/properties/entities",
+      "type": "null",
+      "title": "The Entities Schema"
+    },
+    "views": {
+      "$id": "#/properties/views",
+      "type": "null",
+      "title": "The Views Schema"
+    },
+    "edit_date": {
+      "$id": "#/properties/edit_date",
+      "type": "null",
+      "title": "The Edit_date Schema"
+    },
+    "post_author": {
+      "$id": "#/properties/post_author",
+      "type": "null",
+      "title": "The Post_author Schema"
+    },
+    "grouped_id": {
+      "$id": "#/properties/grouped_id",
+      "type": "null",
+      "title": "The Grouped_id Schema"
+    },
+    "from_scheduled": {
+      "$id": "#/properties/from_scheduled",
+      "type": "boolean",
+      "title": "The From_scheduled Schema"
+    },
+    "legacy": {
+      "$id": "#/properties/legacy",
+      "type": "boolean",
+      "title": "The Legacy Schema"
+    },
+    "edit_hide": {
+      "$id": "#/properties/edit_hide",
+      "type": "boolean",
+      "title": "The Edit_hide Schema"
+    },
+    "restriction_reason": {
+      "$id": "#/properties/restriction_reason",
+      "type": "null",
+      "title": "The Restriction_reason Schema"
+    },
+    "action": {
+      "$id": "#/properties/action",
+      "type": "null",
+      "title": "The Action Schema"
+    }
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "object",
+  "title": "Telegram Plain Message",
+  "properties": {
+    "id": {
+      "$id": "#/properties/id",
+      "type": "integer",
+      "title": " ID"
+    },
+    "to_id": {
+      "$id": "#/properties/to_id",
+      "type": "object",
+      "title": "To ID",
+      "required": [
+        "PeerUser"
+      ],
+      "properties": {
+        "PeerUser": {
+          "$id": "#/properties/to_id/properties/PeerUser",
+          "type": "object",
+          "title": "Peeruser",
+          "required": [
+            "user_id"
+          ],
+          "properties": {
+            "user_id": {
+              "$id": "#/properties/to_id/properties/PeerUser/properties/user_id",
+              "type": "integer",
+              "title": "User ID"
+            }
+          }
+        }
+      }
+    },
+    "date": {
+      "$id": "#/properties/date",
+      "type": "string",
+      "format": "date-time",
+      "title": "Date",
+      "pattern": "^(.*)$"
+    },
+    "out": {
+      "$id": "#/properties/out",
+      "type": "boolean",
+      "title": "Out"
+    },
+    "mentioned": {
+      "$id": "#/properties/mentioned",
+      "type": "boolean",
+      "title": "Mentioned"
+    },
+    "silent": {
+      "$id": "#/properties/silent",
+      "type": "boolean",
+      "title": "Silent"
+    },
+    "post": {
+      "$id": "#/properties/post",
+      "type": "boolean",
+      "title": "Post"
+    },
+    "from_id": {
+      "$id": "#/properties/from_id",
+      "type": "integer",
+      "title": "From ID"
+    },
+    "reply_to_msg_id": {
+      "$id": "#/properties/reply_to_msg_id",
+      "type": "integer",
+      "title": "Reply-to-msg ID"
+    },
+    "message": {
+      "$id": "#/properties/message",
+      "type": "string",
+      "title": "Message",
+      "pattern": "^(.*)$"
+    },
+    "fwd_from": {
+      "$id": "#/properties/fwd_from",
+      "type": "integer",
+      "title": "Fwd from"
+    },
+    "via_bot_id": {
+      "$id": "#/properties/via_bot_id",
+      "type": "integer",
+      "title": "Via-Bot ID"
+    },
+    "reply_markup": {
+      "$id": "#/properties/reply_markup",
+      "type": "string",
+      "title": "Reply Markup"
+    },
+    "entities": {
+      "$id": "#/properties/entities",
+      "type": "array",
+      "title": "Entities",
+      "items": {
+        "$id": "#/properties/entities/items",
+        "type": "null",
+        "title": "Items"
+      }
+    },
+    "views": {
+      "$id": "#/properties/views",
+      "type": "string",
+      "title": "Views"
+    },
+    "media": {
+      "$id": "#/properties/value/properties/media",
+      "type": "object",
+      "title": "Media"
+    },
+    "edit_date": {
+      "$id": "#/properties/edit_date",
+      "type": "string",
+      "format": "date-time",
+      "title": "Edit Date"
+    },
+    "post_author": {
+      "$id": "#/properties/post_author",
+      "type": "string",
+      "title": "Post Author"
+    },
+    "grouped_id": {
+      "$id": "#/properties/grouped_id",
+      "type": "integer",
+      "title": "Grouped ID"
+    },
+    "from_scheduled": {
+      "$id": "#/properties/from_scheduled",
+      "type": "boolean",
+      "title": "From Scheduled"
+    },
+    "legacy": {
+      "$id": "#/properties/legacy",
+      "type": "boolean",
+      "title": "Legacy"
+    },
+    "edit_hide": {
+      "$id": "#/properties/edit_hide",
+      "type": "boolean",
+      "title": "Edit hide"
+    },
+    "restriction_reason": {
+      "$id": "#/properties/restriction_reason",
+      "type": "string",
+      "title": "Restriction Reason"
+    },
+    "action": {
+      "$id": "#/properties/action",
+      "type": "string",
+      "title": "Action"
+    }
+  }
+}
+
