@@ -1,12 +1,12 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='sonar-telegram',
+    name='sonar_telegram',
     description='simple telegran client to interact with sonar',
     version='0.1',
     packages=find_packages(),
     license='MIT',
-    py_modules=['sonar-telegram', 'telethon'],
+    py_modules=['sonar_telegram_cli', 'sonar_telegram', 'telegram_api_credentials'],
     install_requires=[
         'Click',
         ],
@@ -16,6 +16,6 @@ setup(
     zip_safe=False,
     entry_points='''
         [console_scripts]
-        sonar-telegram=sonar_telegram:cli
+        sonar_telegram=sonar_telegram_cli:cli
     '''
     )

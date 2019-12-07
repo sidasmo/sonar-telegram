@@ -31,7 +31,7 @@ def listen(dialog_id):
 @click.argument('message')
 @click.argument('entity')
 def send(message, entity):
-    opts = {"message": message, 'entity':entity}
+    opts = {"message": message, 'entity': entity}
     loop(send_message, opts)
 
 

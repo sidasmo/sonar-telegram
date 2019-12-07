@@ -177,7 +177,6 @@ def filter_telMessage(message):
 
 
 async def init(loop, callback=None, opts=None):
-    print("INIT")
     client = SonarTelegram(
         loop=loop,
         api_id=api_id,
