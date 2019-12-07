@@ -4,10 +4,12 @@ import asyncio
 import json
 import datetime
 from telethon import TelegramClient
-from telethon.tl.types import DocumentAttributeFilename
+from telethon.tl.types import DocumentAttributeFilename, MessageMediaDocument, MessageMediaPhoto, PeerUser, Document, DocumentAttributeVideo, DocumentAttributeFilename, PhotoStrippedSize, PhotoSize, InputPeerSelf, InputPeerUser, User, UserStatusOffline, UserProfilePhoto, Photo, MessageService, MessageActionPhoneCall, MessageService, PhoneCallDiscardReasonMissed, PhoneCallDiscardReasonHangup, FileLocationToBeDeprecated, DocumentAttributeAudio
+from telethon.tl.patched import Message
 from tika import parser
 from sonarclient import SonarClient
 from telegram_api_credentials import api_id, api_hash
+
 
 class SonarTelegram():
 
@@ -57,12 +59,12 @@ class SonarTelegram():
 
     # async def create_message_schema(self, message):
         # return json.dumps({
-            # "id": message.id,
-            # "from_id": message.from_id,
-            # "date": message.date.isoformat(),
-            # "content": message.message,
-            # "silent": message.silent,
-            # "mentioned": message.mentioned
+        # "id": message.id,
+        # "from_id": message.from_id,
+        # "date": message.date.isoformat(),
+        # "content": message.message,
+        # "silent": message.silent,
+        # "mentioned": message.mentioned
         # })
         # return json.dumps(message, cls=teleJSONEncoder)
 
@@ -130,9 +132,11 @@ async def demo(client):
             "id": "telegram." + str(msg["id"])
         })
 
+
 def date_format(message):
     if type(message) == datetime:
         return message.isoformat()
+
 
 class teleJSONEncoder(json.JSONEncoder):
     def default(self, o):
@@ -162,14 +166,15 @@ class teleJSONEncoder(json.JSONEncoder):
             }
         pass
 
+
 def filter_telMessage(message):
     message = message.__dict__.items()
     retMessage = {}
-    wanted = ['id', 'to_id', 'date', 'out', 'mentioned', 'media']
     for (key, val) in message:
         if (key[0] != '_'):
-            retMessage[key]=val
+            retMessage[key] = val
     return retMessage
+
 
 async def init(loop, callback=None, opts=None):
     print("INIT")

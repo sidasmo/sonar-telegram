@@ -28,9 +28,10 @@ def listen(dialog_id):
 
 
 @cli.command()
-@click.argument('msg')
-def send(msg):
-    opts = {"msg": msg}
+@click.argument('message')
+@click.argument('entity')
+def send(message, entity):
+    opts = {"message": message, 'entity':entity}
     loop(send_message, opts)
 
 
@@ -42,9 +43,10 @@ def dialog(dialog_id):
 
 
 async def send_message(client, opts={}):
-    msg = opts.get('msg')
+    msg = opts.get('message')
+    entity = opts.get('entity')
     if msg is not None:
-        await client.telegram.send_message("franz", msg)
+        await client.telegram.send_message(entity, msg)
 
 
 async def listen_cb(client, opts={}):
