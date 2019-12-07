@@ -3,17 +3,15 @@ import sys
 import asyncio
 import json
 import datetime
-from telethon import TelegramClient, events
-from telethon.tl.patched import Message
-from telethon.tl.types import DocumentAttributeFilename, MessageMediaDocument, MessageMediaPhoto, PeerUser, Document, DocumentAttributeVideo, DocumentAttributeFilename, PhotoStrippedSize, PhotoSize, InputPeerSelf, InputPeerUser, User, UserStatusOffline, UserProfilePhoto, Photo, MessageService, MessageActionPhoneCall, MessageService, PhoneCallDiscardReasonMissed, PhoneCallDiscardReasonHangup, FileLocationToBeDeprecated, DocumentAttributeAudio
+from telethon import TelegramClient
+from telethon.tl.types import DocumentAttributeFilename
 from tika import parser
 from sonarclient import SonarClient
-from telegram_api_credentials import *
+from telegram_api_credentials import api_id, api_hash
 
 class SonarTelegram():
 
     def __init__(self, loop, api_id, api_hash, island, session_name, endpoint):
-        print(loop, api_id, api_hash, session_name, endpoint)
         self.loop = loop or asyncio.get_event_loop()
         self.sonar = SonarClient(endpoint, island)
         self.api_id = api_id
@@ -22,13 +20,7 @@ class SonarTelegram():
                                        self.api_id,
                                        self.api_hash,
                                        loop=self.loop)
-
         self.data = {}
-
-        # @self.telegram.on(events.NewMessage)
-        # async def my_event_handler(event):
-            # print("EVENT")
-            # print(event.original_update)
 
     async def ensure_schema(self, schema_name, schema):
         schema = await self.sonar.get_schema(schema_name)
@@ -179,7 +171,8 @@ def filter_telMessage(message):
             retMessage[key]=val
     return retMessage
 
-async def init(loop):
+async def init(loop, callback=None, opts=None):
+    print("INIT")
     client = SonarTelegram(
         loop=loop,
         api_id=api_id,
@@ -191,18 +184,23 @@ async def init(loop):
     try:
         await client.telegram.connect()
         await client.telegram.start()
-
     except Exception as e:
         print('Failed to connect', e, file=sys.stderr)
         return
 
-    async with client.telegram:
-        await demo(client)
-        await client.telegram.run_until_disconnected()
+    if callback:
+        async with client.telegram:
+            try:
+                await callback(client, opts)
+                await client.sonar.close()
+            except Exception as e:
+                print('Failed in command callback', e, file=sys.stderr)
+                return
+
+        # async with client.telegram:
+            # await client.telegram.run_until_disconnected()
 
     return loop
-    # while True:
-    #    await asyncio.sleep(0)
 
 if __name__ == "__main__":
     aio_loop = asyncio.get_event_loop()
