@@ -2,13 +2,12 @@ import os
 import sys
 import asyncio
 import json
-import datetime
 from telethon import TelegramClient
-from telethon.tl.types import DocumentAttributeFilename, MessageMediaDocument, MessageMediaPhoto, PeerUser, Document, DocumentAttributeVideo, DocumentAttributeFilename, PhotoStrippedSize, PhotoSize, InputPeerSelf, InputPeerUser, User, UserStatusOffline, UserProfilePhoto, Photo, MessageService, MessageActionPhoneCall, MessageService, PhoneCallDiscardReasonMissed, PhoneCallDiscardReasonHangup, FileLocationToBeDeprecated, DocumentAttributeAudio
-from telethon.tl.patched import Message
+from telethon.tl.types import DocumentAttributeFilename
 from tika import parser
 from sonarclient import SonarClient
 from telegram_api_credentials import api_id, api_hash
+from json_encoder import teleJSONEncoder
 
 
 class SonarTelegram():
@@ -131,50 +130,6 @@ async def demo(client):
             "value": msg,
             "id": "telegram." + str(msg["id"])
         })
-
-
-def date_format(message):
-    if type(message) == datetime:
-        return message.isoformat()
-
-
-class teleJSONEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, (str, int, float)):
-            return json.JSONEncoder.default(self, o)
-        elif o is None:
-            return 'Python_None'
-        elif isinstance(o, Message):
-            return filter_telMessage(o)
-        elif isinstance(o, MessageService):
-            return o.__dict__
-        elif isinstance(o, datetime.date):
-            return o.isoformat()
-        elif isinstance(o, MessageMediaDocument):
-            return {
-                o.__class__.__name__: o.document.__dict__,
-                'ttl_seconds': o.ttl_seconds
-            }
-        elif isinstance(o, MessageMediaPhoto):
-            return {
-                o.__class__.__name__: o.photo.__dict__,
-                'ttl_seconds': o.ttl_seconds
-            }
-        elif isinstance(o, (Document, PeerUser, DocumentAttributeVideo, DocumentAttributeFilename, PhotoStrippedSize, PhotoSize, InputPeerSelf, InputPeerUser, User, UserStatusOffline, UserProfilePhoto, Photo, MessageActionPhoneCall, MessageService, PhoneCallDiscardReasonMissed, PhoneCallDiscardReasonHangup, FileLocationToBeDeprecated, DocumentAttributeAudio)):
-            return {
-                o.__class__.__name__: o.__dict__
-            }
-        pass
-
-
-def filter_telMessage(message):
-    message = message.__dict__.items()
-    retMessage = {}
-    for (key, val) in message:
-        if (key[0] != '_'):
-            retMessage[key] = val
-    return retMessage
-
 
 async def init(loop, callback=None, opts=None):
     client = SonarTelegram(
