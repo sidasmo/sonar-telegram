@@ -49,8 +49,8 @@ class SonarTelegram():
             "entity_id": dialog.id,
         })
 
-    async def get_entities(self, entity_id):
-        entity_set = []
+    async def import_entity(self, entity_id):
+        ids = []
         entities = self.telegram.iter_messages(entity_id)
         async for entity in entities:
             user_id = entity.to_id.user_id
@@ -59,9 +59,9 @@ class SonarTelegram():
             entity.first_name = full.user.first_name
             print(entity.username, entity.first_name, entity.message)
             entity_json = json.dumps(entity, cls=teleJSONEncoder)
-            #print(entity_json)
-            entity_set.append(entity_json)
-        return entity_set
+            id = await self.put_message(entity_json)
+            ids.append(id)
+        return ids
 
     # async def create_message_schema(self, message):
         # return json.dumps({
@@ -119,25 +119,27 @@ class SonarTelegram():
             await self.sonar.put_schema('telegram.plainMessage', data)
         return True
 
-    async def put_messages(self, messages):
-        res = []
-        for msg in messages:
-            msg = json.loads(msg)
-            if msg['media'] is None:
-                schema = "telegram.plainMessage"
-            elif 'MessageMediaAudio' in msg['media']:
-                schema = "telegram.audioMessage"
-            elif 'MessageMediaVideo' in msg['media']:
-                schema = "telegram.videoMessage"
-            elif 'MessageMediaPhoto' in msg['media']:
-                schema = "telegram.audioPhoto"
-            id = await self.sonar.put({
-                "schema": schema,
-                "value": msg,
-                "id": "telegram." + str(msg["id"])
-            })
-            res.append(id)
-        return res
+    async def put_message(self, message):
+        ''' TODO: Save the remaining schemas
+        (for example MessageMediaDocument) in
+        ../schemas and adjust the if-queries here
+        '''
+        msg = json.loads(message)
+        print(msg['media'])
+        if msg['media'] is None:
+            schema = "telegram.plainMessage"
+        elif 'MessageMediaAudio' in msg['media']:
+            schema = "telegram.audioMessage"
+        elif 'MessageMediaVideo' in msg['media']:
+            schema = "telegram.videoMessage"
+        elif 'MessageMediaPhoto' in msg['media']:
+            schema = "telegram.audioPhoto"
+        id = await self.sonar.put({
+            "schema": schema,
+            "value": msg,
+            "id": "telegram." + str(msg["id"])
+        })
+        return id
 
 
 # async def demo(client):

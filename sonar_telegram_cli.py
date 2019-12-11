@@ -52,8 +52,8 @@ async def send_message(client, opts={}):
 async def listen_cb(client, opts={}):
     @client.telegram.on(events.NewMessage(chats=(opts.get('entity_id'))))
     async def listen(event):
-        print('{}'.format(event.message))
-
+        id = await client.import_entity(event.message.id)
+        print('ID: {}, Message {}'.format(id, event.message))
     # listen for events until the connection is closed (ie forever)
     async with client.telegram:
         await client.telegram.run_until_disconnected()
@@ -62,10 +62,9 @@ async def listen_cb(client, opts={}):
 async def get_entity_cb(client, opts={}):
     await client.init_schemata()
     entity_id = opts.get("entity_id")
-    entities = await client.get_entities(entity_id)
-    sonar_record_ids = await client.put_messages(entities)
-    print(sonar_record_ids)
-    return sonar_record_ids
+    ids = await client.import_entity(entity_id)
+    print(ids)
+    return ids
 
 
 async def dialogs_cb(client, opts={}):
