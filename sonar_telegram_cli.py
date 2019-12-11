@@ -18,12 +18,12 @@ def dialogs():
 
 
 @cli.command()
-@click.option('-d', '--dialog_id', default='all')
-def listen(dialog_id):
-    if dialog_id == 'all':
+@click.option('-d', '--entity_id', default='all')
+def listen(entity_id):
+    if entity_id == 'all':
         opts = {}
     else:
-        opts = {"dialog_id": int(dialog_id)}
+        opts = {"entity_id": int(entity_id)}
     loop(listen_cb, opts)
 
 
@@ -36,10 +36,10 @@ def send(message, entity):
 
 
 @cli.command()
-@click.argument('dialog_id')
-def dialog(dialog_id):
-    opts = {"dialog_id": int(dialog_id)}
-    loop(get_dialog_cb, opts)
+@click.argument('entity_id')
+def entity(entity_id):
+    opts = {"entity_id": int(entity_id)}
+    loop(get_entity_cb, opts)
 
 
 async def send_message(client, opts={}):
@@ -50,7 +50,7 @@ async def send_message(client, opts={}):
 
 
 async def listen_cb(client, opts={}):
-    @client.telegram.on(events.NewMessage(chats=(opts.get('dialog_id'))))
+    @client.telegram.on(events.NewMessage(chats=(opts.get('entity_id'))))
     async def listen(event):
         print('{}'.format(event.message))
 
@@ -59,12 +59,13 @@ async def listen_cb(client, opts={}):
         await client.telegram.run_until_disconnected()
 
 
-async def get_dialog_cb(client, opts={}):
-    dialog_id = opts.get("dialog_id")
-    dialog = await client.get_messages(dialog_id)
-    print(dialog)
-    # print("Name: {}, User_ID: {}, Dialog_ID: {}  ".format(dialog.name, dialog))
-    return dialog
+async def get_entity_cb(client, opts={}):
+    await client.init_schemata()
+    entity_id = opts.get("entity_id")
+    entities = await client.get_entities(entity_id)
+    sonar_record_ids = await client.put_messages(entities)
+    print(sonar_record_ids)
+    return sonar_record_ids
 
 
 async def dialogs_cb(client, opts={}):

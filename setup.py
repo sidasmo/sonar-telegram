@@ -6,7 +6,7 @@ setup(
     version='0.1',
     packages=find_packages(),
     license='MIT',
-    py_modules=['sonar_telegram_cli', 'sonar_telegram', 'telegram_api_credentials'],
+    py_modules=['sonar_telegram_cli', 'sonar_telegram', 'json_encoder','telegram_api_credentials'],
     install_requires=[
         'Click',
         'aiohttp',

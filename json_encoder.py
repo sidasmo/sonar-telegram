@@ -6,7 +6,6 @@ from telethon.tl.patched import Message
 
 class teleJSONEncoder(json.JSONEncoder):
     def default(self, o):
-        print('Was HERE!!!!!!!')
         if isinstance(o, (str, int, float)):
             return json.JSONEncoder.default(self, o)
         elif o is None:
@@ -41,4 +40,3 @@ def filter_telMessage(message):
         if (key[0] != '_'):
             retMessage[key] = val
     return retMessage
-
