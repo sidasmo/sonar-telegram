@@ -1,11 +1,12 @@
 # sonar-telegram  📡
 
-## Installation
-**Sonar** is a p2p database and search engine running on top of the dat stack.
+**Early stage WIP! Not yet stable in any way!**
+
+@arso-project/sonar is a p2p database and search engine running on top of the dat stack.
 
 ## Getting started
 
-To get started, clone this repository and the sonar-client-python repository then:
+To get started, clone this repository and the @osuiowq/sonar-client-python repository then:
 
 ```sh
 # first
