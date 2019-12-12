@@ -76,25 +76,35 @@ class SonarTelegram():
         (for example the Schema for channels without user_id) in
         ../schemas and adjust the if-queries here
         '''
+        # TODO: get file and push it to fs
         msg = json.loads(message)
         if msg['media'] is None:
             schema = "telegram.plainMessage"
-        elif 'MessageMediaAudio' in msg['media']:
-            schema = "telegram.audioMessage"
-        elif 'MessageMediaVideo' in msg['media']:
-            schema = "telegram.videoMessage"
-        elif 'MessageMediaPhoto' in msg['media']:
-            schema = "telegram.audioPhoto"
-        elif 'MessageMediaDocument' in msg['media']:
-            schema = "telegram.documentMessage"
         else:
-            print(json.dumps(msg['media'], cls=teleJSONEncoder))
-            return None
+            if 'MessageMediaAudio' in msg['media']:
+                media_id = msg.get('media').get('MessageMediaAudio').get('id')
+                schema = "telegram.audioMessage"
+            elif 'MessageMediaVideo' in msg['media']:
+                media_id = msg.get('media').get('MessageMediaVideo').get('id')
+                schema = "telegram.videoMessage"
+            elif 'MessageMediaPhoto' in msg['media']:
+                media_id = msg.get('media').get('MessageMediaPhoto').get('id')
+                schema = "telegram.audioPhoto"
+            elif 'MessageMediaDocument' in msg['media']:
+                media_id = msg.get('id')
+                schema = "telegram.documentMessage"
+            else:
+                print(json.dumps(msg['media'], cls=teleJSONEncoder))
+                return None
+            file_bytes = self.telegram.download_media(msg, "./file")
+            # TODO: how to handle the file bytes coroutine object?
+            print(media_id, str(file_bytes))
         id = await self.sonar.put({
             "schema": schema,
             "value": msg,
             "id": "telegram." + str(msg["id"])
         })
+        print(id)
         return id
 
 
