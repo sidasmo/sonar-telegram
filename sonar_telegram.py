@@ -1,10 +1,8 @@
-import os
 import sys
 import asyncio
 import json
 from telethon import TelegramClient
 from telethon.tl.types import DocumentAttributeFilename
-from tika import parser
 from sonarclient import SonarClient
 from telegram_api_credentials import api_id, api_hash
 from json_encoder import teleJSONEncoder
@@ -23,15 +21,6 @@ class SonarTelegram():
                                        self.api_hash,
                                        loop=self.loop)
         self.data = {}
-
-    # async def ensure_schema(self, schema_name, schema):
-    #     schema = await self.sonar.get_schema(schema_name)
-    #     if schema:
-    #         return schema
-    #     elif await self.sonar.set_schema():
-    #         return True
-    #     else:
-    #         return False
 
     async def get_jsondialogs(self):
         dialogs_list = []
@@ -62,47 +51,6 @@ class SonarTelegram():
             id = await self.put_message(entity_json)
             ids.append(id)
         return ids
-
-    # async def create_message_schema(self, message):
-        # return json.dumps({
-        # "id": message.id,
-        # "from_id": message.from_id,
-        # "date": message.date.isoformat(),
-        # "content": message.message,
-        # "silent": message.silent,
-        # "mentioned": message.mentioned
-        # })
-        # return json.dumps(message, cls=teleJSONEncoder)
-
-    # def create_webpage_schema(self, webpage, msg_id):
-    #     return json.dumps({
-    #         "title": webpage.title,
-    #         "url": webpage.url,
-    #         "sitename": webpage.site_name,
-    #         "description": webpage.description,
-    #         "content_type": "website",
-    #         "telegram_id": msg_id
-    #     })
-
-    # async def create_document_json(self, document, datadir, msg_id):
-    #     for attribute in document.attributes:
-    #         if type(attribute) is DocumentAttributeFilename:
-    #             if not os.path.isfile(datadir + "/" + attribute.file_name):
-    #                 path = await self.telegram.download_media(
-    #                     message=document,
-    #                     file=datadir
-    #                 )
-
-    #                 return {
-    #                     "filename": attribute.file_name,
-    #                     "path": path,
-    #                     "extracted_text": parser.from_file(
-    #                         path
-    #                     )["content"],
-    #                     "telegram_id": msg_id,
-    #                     "content_type": "document",
-    #                     "mime_type": document.mime_type
-    #                 }
 
     async def init_schemata(self):
         with open('./schemas/telSchema_MessageMediaPhoto.json') as json_file:
@@ -140,28 +88,6 @@ class SonarTelegram():
             "id": "telegram." + str(msg["id"])
         })
         return id
-
-
-# async def demo(client):
-#     client.init_schemata()
-#     dialogs = await client.get_jsondialogs()
-#     last_entity_id = json.loads(dialogs[0])["entity_id"]
-#     messages = await client.get_entitys(last_entity_id)
-#     for msg in messages:
-#         msg = json.loads(msg)
-#         if msg['media'] is None:
-#             schema = "telegram.plainMessage"
-#         elif 'MessageMediaAudio' in msg['media']:
-#             schema = "telegram.audioMessage"
-#         elif 'MessageMediaVideo' in msg['media']:
-#             schema = "telegram.videoMessage"
-#         elif 'MessageMediaPhoto' in msg['media']:
-#             schema = "telegram.audioPhoto"
-#         id = await client.sonar.put({
-#             "schema": schema,
-#             "value": msg,
-#             "id": "telegram." + str(msg["id"])
-#         })
 
 
 async def init(loop, callback=None, opts=None):
