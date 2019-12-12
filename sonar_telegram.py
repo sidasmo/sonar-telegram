@@ -43,7 +43,7 @@ class SonarTelegram():
         entities = self.telegram.iter_messages(entity_id)
         async for entity in entities:
             if not (isinstance(entity.to_id, PeerChat) or isinstance(entity.to_id, PeerChannel)):
-                user_id = entity.to_id.user_id
+                user_id = entity.from_id
                 full = await self.telegram(GetFullUserRequest(user_id))
                 entity.username = full.user.username
                 entity.first_name = full.user.first_name
