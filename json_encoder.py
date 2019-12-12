@@ -1,7 +1,13 @@
 import json
 import datetime
-from telethon.tl.types import MessageMediaDocument, MessageMediaPhoto, PeerUser, Document, DocumentAttributeVideo, DocumentAttributeFilename, PhotoStrippedSize, PhotoSize, InputPeerSelf, InputPeerUser, User, UserStatusOffline, UserProfilePhoto, Photo, MessageActionPhoneCall, MessageService, PhoneCallDiscardReasonMissed, PhoneCallDiscardReasonHangup, FileLocationToBeDeprecated, DocumentAttributeAudio
-from telethon.tl.patched import Message
+from telethon.tl.types import MessageMediaDocument, \
+    MessageMediaPhoto, PeerUser, Document, \
+    DocumentAttributeVideo, DocumentAttributeFilename, \
+    PhotoStrippedSize, PhotoSize, InputPeerSelf, \
+    InputPeerUser, User, UserStatusOffline, UserProfilePhoto, \
+    Photo, MessageActionPhoneCall, MessageService, \
+    PhoneCallDiscardReasonMissed, PhoneCallDiscardReasonHangup, \
+    FileLocationToBeDeprecated, DocumentAttributeAudio, Message
 
 
 class teleJSONEncoder(json.JSONEncoder):
@@ -26,7 +32,26 @@ class teleJSONEncoder(json.JSONEncoder):
                 o.__class__.__name__: o.photo.__dict__,
                 'ttl_seconds': o.ttl_seconds
             }
-        elif isinstance(o, (Document, PeerUser, DocumentAttributeVideo, DocumentAttributeFilename, PhotoStrippedSize, PhotoSize, InputPeerSelf, InputPeerUser, User, UserStatusOffline, UserProfilePhoto, Photo, MessageActionPhoneCall, MessageService, PhoneCallDiscardReasonMissed, PhoneCallDiscardReasonHangup, FileLocationToBeDeprecated, DocumentAttributeAudio)):
+        elif isinstance(o, (
+            Document,
+            PeerUser,
+            DocumentAttributeVideo,
+            DocumentAttributeFilename,
+            PhotoStrippedSize,
+            PhotoSize,
+            InputPeerSelf,
+            InputPeerUser,
+            User,
+            UserStatusOffline,
+            UserProfilePhoto,
+            Photo,
+            MessageActionPhoneCall,
+            MessageService,
+            PhoneCallDiscardReasonMissed,
+            PhoneCallDiscardReasonHangup,
+            FileLocationToBeDeprecated,
+            DocumentAttributeAudio)
+        ):
             return {
                 o.__class__.__name__: o.__dict__
             }
