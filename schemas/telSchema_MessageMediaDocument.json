@@ -1,0 +1,78 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "title": "Telegram Document Message",
+    "properties": {
+      "MessageMediaDocument": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "access_hash": {
+            "type": "integer"
+          },
+          "file_reference": {
+            "type": "null"
+          },
+          "date": {
+            "type": "string"
+          },
+          "mime_type": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "dc_id": {
+            "type": "integer"
+          },
+          "attributes": {
+            "type": "array",
+            "items": [
+              {
+                "type": "object",
+                "properties": {
+                  "DocumentAttributeFilename": {
+                    "type": "object",
+                    "properties": {
+                      "file_name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "file_name"
+                    ]
+                  }
+                },
+                "required": [
+                  "DocumentAttributeFilename"
+                ]
+              }
+            ]
+          },
+          "thumbs": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "id",
+          "access_hash",
+          "file_reference",
+          "date",
+          "mime_type",
+          "size",
+          "dc_id",
+          "attributes",
+          "thumbs"
+        ]
+      },
+      "ttl_seconds": {
+        "type": "null"
+      }
+    },
+    "required": [
+      "MessageMediaDocument",
+      "ttl_seconds"
+    ]
+  }
