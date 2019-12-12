@@ -2,7 +2,7 @@ import sys
 import asyncio
 import json
 from telethon import TelegramClient
-from telethon.tl.types import DocumentAttributeFilename
+from telethon.tl.types import PeerChat, PeerChannel, DocumentAttributeFilename
 from sonarclient import SonarClient
 from telegram_api_credentials import api_id, api_hash
 from json_encoder import teleJSONEncoder
@@ -42,11 +42,12 @@ class SonarTelegram():
         ids = []
         entities = self.telegram.iter_messages(entity_id)
         async for entity in entities:
-            user_id = entity.to_id.user_id
-            full = await self.telegram(GetFullUserRequest(user_id))
-            entity.username = full.user.username
-            entity.first_name = full.user.first_name
-            print(entity.username, entity.first_name, entity.message)
+            if not (isinstance(entity.to_id, PeerChat) or isinstance(entity.to_id, PeerChannel)):
+                user_id = entity.to_id.user_id
+                full = await self.telegram(GetFullUserRequest(user_id))
+                entity.username = full.user.username
+                entity.first_name = full.user.first_name
+                print(entity.username, entity.first_name, entity.message)
             entity_json = json.dumps(entity, cls=teleJSONEncoder)
             id = await self.put_message(entity_json)
             ids.append(id)
@@ -65,15 +66,17 @@ class SonarTelegram():
         with open('./schemas/telSchema_MessageMediaPlain.json') as json_file:
             data = json.load(json_file)
             await self.sonar.put_schema('telegram.plainMessage', data)
+        with open('./schemas/telSchema_MessageMediaDocument.json') as json_file:
+            data = json.load(json_file)
+            await self.sonar.put_schema('telegram.documentMessage', data)
         return True
 
     async def put_message(self, message):
         ''' TODO: Save the remaining schemas
-        (for example MessageMediaDocument) in
+        (for example the Schema for channels without user_id) in
         ../schemas and adjust the if-queries here
         '''
         msg = json.loads(message)
-        print(msg['media'])
         if msg['media'] is None:
             schema = "telegram.plainMessage"
         elif 'MessageMediaAudio' in msg['media']:
@@ -82,6 +85,11 @@ class SonarTelegram():
             schema = "telegram.videoMessage"
         elif 'MessageMediaPhoto' in msg['media']:
             schema = "telegram.audioPhoto"
+        elif 'MessageMediaDocument' in msg['media']:
+            schema = "telegram.documentMessage"
+        else:
+            print(json.dumps(msg['media'], cls=teleJSONEncoder))
+            return None
         id = await self.sonar.put({
             "schema": schema,
             "value": msg,
