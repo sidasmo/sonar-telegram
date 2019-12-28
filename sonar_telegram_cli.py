@@ -2,9 +2,13 @@ from sonar_telegram import init
 import asyncio
 import click
 from telethon import events
+import pprint
 import logging
 logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s',
                     level=logging.WARNING)
+
+
+pp = pprint.PrettyPrinter(indent=4)
 
 
 @click.group()
@@ -13,17 +17,21 @@ def cli():
 
 
 @cli.command()
-def dialogs():
-    loop(dialogs_cb)
+@click.option('-i', '--island', default='default')
+def dialogs(island):
+    opts = {"island": island}
+    loop(dialogs_cb, opts)
 
 
 @cli.command()
 @click.option('-d', '--entity_id', default='all')
-def listen(entity_id):
+@click.option('-i', '--island', default='default')
+def listen(entity_id, island):
     if entity_id == 'all':
         opts = {}
     else:
         opts = {"entity_id": int(entity_id)}
+    opts["island"] = island
     loop(listen_cb, opts)
 
 
@@ -37,8 +45,11 @@ def send(message, entity):
 
 @cli.command()
 @click.argument('entity_id')
-def entity(entity_id):
-    opts = {"entity_id": int(entity_id)}
+@click.option('-i', '--island', default='default')
+def entity(entity_id, island):
+    print(island)
+    opts = {"entity_id": int(entity_id),
+            "island": island}
     loop(get_entity_cb, opts)
 
 
@@ -52,7 +63,8 @@ async def send_message(client, opts={}):
 async def listen_cb(client, opts={}):
     @client.telegram.on(events.NewMessage(chats=(opts.get('entity_id'))))
     async def listen(event):
-        id = await client.import_entity(event.message.id)
+        #print(event.message)
+        id = await client.import_message(event.message)
         print('ID: {}, Message {}'.format(id, event.message))
     # listen for events until the connection is closed (ie forever)
     async with client.telegram:
@@ -69,7 +81,7 @@ async def get_entity_cb(client, opts={}):
 
 async def dialogs_cb(client, opts={}):
     dialogs = await client.get_jsondialogs()
-    print(dialogs)
+    pp.pprint(dialogs)
     return dialogs
 
 

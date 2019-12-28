@@ -38,6 +38,17 @@ class SonarTelegram():
             "entity_id": dialog.id,
         })
 
+    async def import_message(self, entity):
+        if not (isinstance(entity.to_id, PeerChat) or isinstance(entity.to_id, PeerChannel)):
+            user_id = entity.from_id
+            full = await self.telegram(GetFullUserRequest(user_id))
+            entity.username = full.user.username
+            entity.first_name = full.user.first_name
+            print(entity.username, entity.first_name, entity.message)
+        entity_json = json.dumps(entity, cls=teleJSONEncoder)
+        id = await self.put_message(entity_json)
+        return id
+
     async def import_entity(self, entity_id):
         ids = []
         entities = self.telegram.iter_messages(entity_id)
@@ -114,7 +125,7 @@ async def init(loop, callback=None, opts=None):
         api_id=api_id,
         api_hash=api_hash,
         session_name='anon',
-        island='default',
+        island=opts['island'],
         endpoint='http://localhost:9191/api')
 
     try:
