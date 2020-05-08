@@ -72,7 +72,9 @@ async def listen_cb(client, opts={}):
 
 
 async def get_entity_cb(client, opts={}):
-    await client.init_schemata()
+    # TODO: change position of this call because we also need to call
+    # it when listening AND we want to call it only once!!
+    await client.ensure_schemata()
     entity_id = opts.get("entity_id")
     ids = await client.import_entity(entity_id)
     print(ids)

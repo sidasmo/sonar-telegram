@@ -62,7 +62,12 @@ class SonarTelegram():
             entity_json = json.dumps(entity, cls=teleJSONEncoder)
             id = await self.put_message(entity_json)
             ids.append(id)
-        return ids
+            
+    async def ensure_schemata(self):
+        schemas = await self.sonar.get_schemas()
+        if not 'telegram.plainMessage' in schemas:
+            print("putting telegram schemata")
+            await self.init_schemata()
 
     async def init_schemata(self):
         with open('./schemas/telSchema_MessageMediaPhoto.json') as json_file:
