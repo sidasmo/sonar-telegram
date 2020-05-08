@@ -7,6 +7,9 @@ from sonarclient import SonarClient
 from telegram_api_credentials import api_id, api_hash
 from json_encoder import teleJSONEncoder
 from telethon.tl.functions.users import GetFullUserRequest
+import pprint
+
+pp = pprint.PrettyPrinter(indent=4)
 
 
 class SonarTelegram():
@@ -66,7 +69,7 @@ class SonarTelegram():
     async def ensure_schemata(self):
         schemas = await self.sonar.get_schemas()
         if not 'telegram.plainMessage' in schemas:
-            print("putting telegram schemata")
+            pp.pprint("putting telegram schemata")
             await self.init_schemata()
 
     async def init_schemata(self):

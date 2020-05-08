@@ -61,6 +61,7 @@ async def send_message(client, opts={}):
 
 
 async def listen_cb(client, opts={}):
+    await client.ensure_schemata()
     @client.telegram.on(events.NewMessage(chats=(opts.get('entity_id'))))
     async def listen(event):
         #print(event.message)
@@ -72,8 +73,6 @@ async def listen_cb(client, opts={}):
 
 
 async def get_entity_cb(client, opts={}):
-    # TODO: change position of this call because we also need to call
-    # it when listening AND we want to call it only once!!
     await client.ensure_schemata()
     entity_id = opts.get("entity_id")
     ids = await client.import_entity(entity_id)
