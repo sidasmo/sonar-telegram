@@ -2,11 +2,11 @@ import sys
 import asyncio
 import json
 from telethon import TelegramClient
-from telethon.tl.types import PeerChat, PeerChannel, DocumentAttributeFilename
 from sonarclient import SonarClient
 from telegram_api_credentials import api_id, api_hash
 from json_encoder import teleJSONEncoder
 from telethon.tl.functions.users import GetFullUserRequest
+from telethon.tl.types import PeerUser, PeerChat, PeerChannel
 import pprint
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -14,9 +14,9 @@ pp = pprint.PrettyPrinter(indent=4)
 
 class SonarTelegram():
 
-    def __init__(self, loop, api_id, api_hash, island, session_name, endpoint):
+    def __init__(self, loop, api_id, api_hash, collection, session_name, endpoint):
         self.loop = loop or asyncio.get_event_loop()
-        self.sonar = SonarClient(endpoint, island)
+        self.sonar = SonarClient()
         self.api_id = api_id
         self.api_hash = api_hash
         self.telegram = TelegramClient(session_name,
@@ -52,8 +52,10 @@ class SonarTelegram():
         id = await self.put_message(entity_json)
         return id
 
-    async def import_entity(self, entity_id):
+    async def import_entity(self, entity_id, collection_name="telegram"):
         ids = []
+        await self.ensure_collection(collection_name)
+        await self.ensure_types()
         entities = self.telegram.iter_messages(entity_id)
         async for entity in entities:
             if not (isinstance(entity.to_id, PeerChat) or isinstance(entity.to_id, PeerChannel)):
@@ -65,35 +67,43 @@ class SonarTelegram():
             entity_json = json.dumps(entity, cls=teleJSONEncoder)
             id = await self.put_message(entity_json)
             ids.append(id)
-            
-    async def ensure_schemata(self):
-        schemas = await self.sonar.get_schemas()
-        if not 'telegram.plainMessage' in schemas:
-            pp.pprint("putting telegram schemata")
-            await self.init_schemata()
 
-    async def init_schemata(self):
+    async def get_info(self):
+        return await self.sonar.info()
+
+    async def ensure_collection(self, name):
+        self.collection = await self.sonar.create_collection(name)
+
+    async def ensure_types(self):
+        types = self.collection.schema.list_types()
+        if 'telegram.plainMessage' not in types:
+            pp.pprint("putting telegram types")
+            await self.load_schemata()
+
+    async def load_schemata(self):
         with open('./schemas/telSchema_MessageMediaPhoto.json') as json_file:
             data = json.load(json_file)
-            await self.sonar.put_schema('telegram.photoMessage', data)
+            print(data)
+            self.collection.schema.add({'telegram.photoMessage': data})
         with open('./schemas/telSchema_MessageMediaVideo.json') as json_file:
             data = json.load(json_file)
-            await self.sonar.put_schema('telegram.videoMessage', data)
+            self.collection.schema.add({'telegram.videoMessage': data})
         with open('./schemas/telSchema_MessageMediaAudio.json') as json_file:
             data = json.load(json_file)
-            await self.sonar.put_schema('telegram.audioMessage', data)
+            self.collection.schema.add({'telegram.audioMessage': data})
         with open('./schemas/telSchema_MessageMediaPlain.json') as json_file:
             data = json.load(json_file)
-            await self.sonar.put_schema('telegram.plainMessage', data)
+            print(data)
+            self.collection.schema.add({'telegram.plainMessage':  data})
         with open('./schemas/telSchema_MessageMediaDocument.json') as json_file:
             data = json.load(json_file)
-            await self.sonar.put_schema('telegram.documentMessage', data)
+            self.collection.schema.add({'telegram.documentMessage': data})
         return True
 
     async def put_message(self, message):
-        ''' TODO: Save the remaining schemas
+        ''' TODO: Save the remaining types
         (for example the Schema for channels without user_id) in
-        ../schemas and adjust the if-queries here
+        ../types and adjust the if-queries here
         '''
         # TODO: get file and push it to fs
         msg = json.loads(message)
@@ -118,7 +128,7 @@ class SonarTelegram():
             file_bytes = self.telegram.download_media(msg, "./file")
             # TODO: how to handle the file bytes coroutine object?
             print(media_id, str(file_bytes))
-        id = await self.sonar.put({
+        id = await self.collection.put({
             "schema": schema,
             "value": msg,
             "id": "telegram." + str(msg["id"])
@@ -133,7 +143,7 @@ async def init(loop, callback=None, opts=None):
         api_id=api_id,
         api_hash=api_hash,
         session_name='anon',
-        island=opts['island'],
+        collection=opts['collection'],
         endpoint='http://localhost:9191/api')
 
     try:
